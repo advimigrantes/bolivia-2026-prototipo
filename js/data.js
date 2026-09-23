@@ -59,8 +59,8 @@ window.appData = {
     {type:"Transfer", item:"La Paz → Coroico", supplier:"Operador Yungas", date:"2026-11-10", status:"pendente", value:"—", currency:"", link:"#", note:"Confirmar até hoje."},
     {type:"Hospedagem", item:"Base Coroico", supplier:"A definir", date:"2026-11-10", status:"a reservar", value:"—", currency:"", link:"#", note:"Ter opção de backup."}
   ],
-  documents: [{name:"Passaporte Andressa",status:"OK"},{name:"Passaporte Paulo",status:"OK"},{name:"Febre amarela",status:"OK"},{name:"Seguro viagem",status:"PENDENTE"},{name:"Documentos offline",status:"PENDENTE"}],
-  contacts: [{name:"Emergência local",category:"emergência",phone:"+591 000 000",whatsapp:"+591 000 000",note:"Mock"},{name:"Operador Yungas",category:"operador",phone:"+591 000 001",whatsapp:"+591 000 001",note:"Transfer La Paz–Coroico"},{name:"Casa Andina La Paz",category:"hospedagem",phone:"+591 000 002",whatsapp:"+591 000 002",note:"Recepção mock"},{name:"Seguro viagem",category:"seguro",phone:"+55 0000-0000",whatsapp:"—",note:"Número fictício"}],
+  documents: [{name:"Seguro viagem",status:"PENDENTE"},{name:"Documentos offline",status:"PENDENTE"}],
+  contacts: [],
   alerts: [
     {type:"Tarefa vencida",text:"Seguro viagem precisava de conferência em 05/11.",level:"critical",target:"pending"},
     {type:"Transporte",text:"Transfer para Coroico ainda não foi confirmado.",level:"critical",target:"pending"},
