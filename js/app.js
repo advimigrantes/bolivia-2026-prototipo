@@ -44,8 +44,8 @@
   };
   const episode = (number) => data.episodes.find((item) => item.number === number);
   const getAllEpisodes = () => data.episodes;
-  const getNextToRecord = () => getAllEpisodes().find((item) => item.status === "A GRAVAR");
-  const getNextToPublish = () => getAllEpisodes().filter((item) => item.editingStatus !== "PUBLICADO" && item.publishDate >= operationalDate()).sort((a,b) => a.publishDate.localeCompare(b.publishDate))[0];
+  const getNextToRecord = () => getAllEpisodes().filter((item) => item.recordingDate && item.recordingDate >= operationalDate() && !/gravado|publicado/i.test(item.status || "")).sort((a,b) => a.recordingDate.localeCompare(b.recordingDate))[0];
+  const getNextToPublish = () => getAllEpisodes().filter((item) => item.publishDate && item.editingStatus !== "PUBLICADO" && item.publishDate >= operationalDate()).sort((a,b) => a.publishDate.localeCompare(b.publishDate))[0];
   const getContentStock = () => getAllEpisodes().filter((item) => ["GRAVADO","EDITANDO","PRONTO"].includes(item.status) && item.editingStatus !== "PUBLICADO");
   const episodeTone = (item) => statusTone(item.editingStatus === "EDITANDO" ? item.editingStatus : item.status);
   const lodging = (id) => data.lodgings.find((item) => item.id === id);
@@ -166,7 +166,7 @@
     const productionMetric = (label,value,detail,action,tone="") => `<button type="button" class="metric production-metric ${tone} ${state.productionFilter===action?"selected":""}" data-production-card="${action}" aria-pressed="${state.productionFilter===action}" aria-label="${label}: ${value}. ${detail}"><span>${label}</span><b>${value}</b><small class="tiny">${detail}</small></button>`;
     const episodeRow = (e) => `<button class="list-item production-episode" data-expand="ep${e.number}" aria-label="Abrir detalhes do episódio ${e.number}: ${e.title}">
       <span class="production-number">${String(e.number).padStart(2,"0")}</span>
-      <span class="production-story"><span class="item-title">${e.title}</span><span class="production-location">${e.city}<span>Gravação ${formatDate(e.recordingDate)}</span></span></span>
+      <span class="production-story"><span class="item-title">${e.title}</span><span class="production-location">${e.city}<span>Gravação ${e.recordingDate?formatDate(e.recordingDate):"A definir"}</span></span></span>
       <span class="production-publication"><span class="production-column-label">Publicação</span><strong>${formatDate(e.publishDate)}</strong></span>
       <span class="production-status-group production-capture"><span class="production-column-label">Captação</span><span class="status ${productionStatusTone(e.status)}">${e.status}</span></span>
       <span class="production-status-group production-editing"><span class="production-column-label">Edição</span><span class="status ${productionStatusTone(e.editingStatus)}">${e.editingStatus}</span></span>
@@ -175,8 +175,8 @@
     return `${pageTitle("Produção","Captação, edição e publicação")}
       <div class="production-summary">
         ${productionMetric("Episódios",`${getAllEpisodes().length} definidos`,"Ver todos os episódios","all")}
-        ${productionMetric("Próximo a gravar",`#${String(nextRecording.number).padStart(2,"0")} — ${nextRecording.title}`,`${formatDate(nextRecording.recordingDate)} · ${nextRecording.city}`,`episode-${nextRecording.number}`,"warning")}
-        ${productionMetric("Próxima publicação",nextPublication.title,formatDate(nextPublication.publishDate),`episode-${nextPublication.number}`)}
+        ${productionMetric("Próximo a gravar",nextRecording?`#${String(nextRecording.number).padStart(2,"0")} — ${nextRecording.title}`:"—",nextRecording?`${formatDate(nextRecording.recordingDate)} · ${nextRecording.city}`:"Sem gravação futura","all","warning")}
+        ${productionMetric("Próxima publicação",nextPublication?nextPublication.title:"—",nextPublication?formatDate(nextPublication.publishDate):"Sem publicação futura","all")}
         ${productionMetric("Estoque",`${stock.length} episódios`,"gravados e não publicados","stock","stock")}
       </div>
       ${state.productionFilter==="stock"?`<div class="production-filter-active" role="status"><span>Estoque · ${stock.length} episódios</span><button type="button" data-production-card="all">Limpar filtro</button></div>`:""}
@@ -191,7 +191,13 @@
   const applyRoute = (route) => { state.view=route.view; state.tripView=route.tripView || null; state.episodeView=route.episodeView || null; state.routeFilter=route.routeFilter || state.routeFilter; state.routeCity=route.routeCity || state.routeCity; state.expanded=route.routeItem || null; render(); $("#app").focus(); if(route.routeItem)document.querySelector(`[data-route-card="${route.routeItem}"]`)?.scrollIntoView({block:"start"}); };
   const navigate = (route) => { if(route.view===state.view && (route.tripView || null)===(state.tripView || null) && (route.episodeView || null)===(state.episodeView || null)) return; state.navigationDepth+=1; const fragment=route.episodeView?`${route.view}/episode/${route.episodeView}`:`${route.view}${route.tripView?`/${route.tripView}`:""}`; window.history.pushState({boliviaApp:true,route,depth:state.navigationDepth},"",`#${fragment}`); applyRoute(route); };
   const goBack = () => { if(state.navigationDepth>0) window.history.back(); };
-  window.history.replaceState({boliviaApp:true,route:routeSnapshot(),depth:0},"",`${window.location.pathname}#today`);
+  const initialPath = window.location.hash.slice(1).split("/");
+  const primaryViews = ["today","route","pending","production","trip"];
+  if(primaryViews.includes(initialPath[0])) state.view=initialPath[0];
+  if(state.view==="trip" && ["flights","transports","lodgings","reservations","documents","contacts"].includes(initialPath[1])) state.tripView=initialPath[1];
+  if(state.view==="production" && initialPath[1]==="episode" && /^\d+$/.test(initialPath[2] || "")) state.episodeView=Number(initialPath[2]);
+  const initialFragment=state.episodeView?`${state.view}/episode/${state.episodeView}`:`${state.view}${state.tripView?`/${state.tripView}`:""}`;
+  window.history.replaceState({boliviaApp:true,route:routeSnapshot(),depth:0},"",`${window.location.pathname}#${initialFragment}`);
   window.addEventListener("popstate",(event)=>{ if(event.state?.boliviaApp){ state.navigationDepth=event.state.depth; applyRoute(event.state.route); } else { state.navigationDepth=0; applyRoute({view:"today",tripView:null}); } });
   document.addEventListener("click",(event)=>{ const card=event.target.closest?.("[data-production-card]"); if(card){event.preventDefault();event.stopImmediatePropagation();const action=card.dataset.productionCard;if(action==="all"){state.productionFilter=null;state.episodeView=null;state.view="production";render();document.querySelector("#production-episodes")?.scrollIntoView({behavior:"smooth",block:"start"});}else if(action==="stock"){state.productionFilter="stock";state.episodeView=null;state.view="production";render();document.querySelector("#production-episodes")?.scrollIntoView({behavior:"smooth",block:"start"});}else navigate({view:"production",episodeView:Number(action.slice(8))});return;} const target=event.target.closest?.("[data-view],[data-open-route],[data-trip-view],[data-trip-back],[data-nav-back],[data-expand]"); if(!target) return; if(target.dataset.expand?.startsWith("ep")) navigate({view:"production",episodeView:Number(target.dataset.expand.slice(2))}); else if(target.dataset.openRoute) navigate({view:"route",routeFilter:target.dataset.openRoute,routeCity:"all",routeItem:target.dataset.routeItem || null}); else if(target.dataset.view) navigate({view:target.dataset.view,tripView:null,episodeView:null}); else if(target.dataset.tripView) navigate({view:"trip",tripView:target.dataset.tripView,episodeView:null}); else if(target.hasAttribute("data-trip-back") || target.hasAttribute("data-nav-back")) goBack(); else return; event.preventDefault(); event.stopImmediatePropagation(); },true);
   document.addEventListener("click",(event)=>{ const city=event.target.closest?.("[data-city-info]"); if(city){event.preventDefault();openCityDialog(city.dataset.cityInfo);return;} if(event.target.closest?.("[data-city-close]") || event.target.classList?.contains("city-dialog"))document.querySelector(".city-dialog")?.remove(); });
