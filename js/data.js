@@ -1,9 +1,8 @@
-/* Única fonte de dados do protótipo. Substituir apenas este objeto na futura camada de leitura. */
+/* Fallback mínimo: a fonte operacional é a API de leitura da planilha. */
 window.appData = {
   trip: {
     name: "Bolívia 2026", destination: "Bolívia", startDate: "2026-11-04", endDate: "2026-12-22",
-    currentDate: "2026-11-07", currentCity: "La Paz", nextCity: "Coroico", period: "Dia 4 de 49",
-    generalStatus: "Em viagem", lastUpdated: "Hoje, 21:42", activeLodgingId: "h1"
+    currentCity: "La Paz", nextCity: "Coroico", generalStatus: "Em viagem", lastUpdated: "Fallback local", activeLodgingId: "h1"
   },
   itinerary: [
     { id:"r1", date:"2026-11-04", city:"La Paz", region:"La Paz", activity:"Chegada e adaptação", dayType:"CHEGADA LEVE", episode:1, place:"Aeroporto Internacional de El Alto", origin:"São Paulo", destination:"La Paz", mode:"avião", time:"15:40", status:"confirmado", priority:"alta", lodgingId:"h1", points:["Aeroporto de El Alto","Hospedagem","Jantar leve"] },
