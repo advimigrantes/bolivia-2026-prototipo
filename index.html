@@ -4,7 +4,13 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#173b3a" />
-    <title>Bolívia 2026 — Protótipo local</title>
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Bolívia 2026" />
+    <meta name="description" content="Painel de viagem e produção da Bolívia 2026." />
+    <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="apple-touch-icon" href="assets/icon-192.png" />
+    <title>Bolívia 2026</title>
     <link rel="stylesheet" href="css/styles.css" />
   </head>
   <body>
@@ -23,5 +29,6 @@
     <script src="js/data.js"></script>
     <script src="js/maps.js"></script>
     <script src="js/app.js"></script>
+    <script>if ("serviceWorker" in navigator) window.addEventListener("load", () => navigator.serviceWorker.register("service-worker.js"));</script>
   </body>
 </html>
