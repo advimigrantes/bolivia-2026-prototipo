@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title">
+  <title id="title">Bolívia 2026 — trajeto e destino</title>
+  <rect width="512" height="512" fill="#f7f5ec"/>
+  <path d="M139 364c57 0 76-61 126-61 29 0 46 17 69 30" fill="none" stroke="#244d54" stroke-width="32" stroke-linecap="round"/>
+  <circle cx="139" cy="364" r="27" fill="#8c4a32" stroke="#244d54" stroke-width="8"/>
+  <path d="M334 118c-48 0-85 39-85 86 0 58 85 130 85 130s85-72 85-130c0-47-37-86-85-86Z" fill="#cda836" stroke="#244d54" stroke-width="15" stroke-linejoin="round"/>
+  <circle cx="334" cy="204" r="31" fill="#f7f5ec"/>
+</svg>
